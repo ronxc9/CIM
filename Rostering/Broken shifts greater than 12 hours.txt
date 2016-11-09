@@ -1,0 +1,46 @@
+="SELECT DBA.ro_curr_shift_line.employee_code, DBA.py_employee_master.surname, DBA.py_employee_master.christian_name_1, DBA.py_employee_master.location as [py_location]," & vbCrLf & 
+"DBA.py_employee_master.classification_code, DBA.ro_curr_header.roster_no,DBA.ro_curr_shift_line.shift_date, " & vbCrLf & 
+"DBA.ro_curr_shift_line.shift_type, DBA.ro_curr_shift_line.start_time, DBA.ro_curr_shift_line.end_time, " & vbCrLf & 
+"DBA.ro_curr_header.location as [ro_location]" & vbCrLf & 
+"INTO #employee_shift_dates" & vbCrLf & 
+"FROM DBA.ro_curr_header" & vbCrLf & 
+"INNER JOIN DBA.ro_curr_shift_line ON DBA.ro_curr_header.roster_no = DBA.ro_curr_shift_line.roster_no" & vbCrLf & 
+"INNER JOIN DBA.ro_shift_type ON DBA.ro_shift_type.type = DBA.ro_curr_shift_line.shift_type" & vbCrLf & 
+"INNER JOIN DBA.py_employee_master ON DBA.py_employee_master.employee_code = DBA.ro_curr_shift_line.employee_code" & vbCrLf & 
+"WHERE DBA.ro_curr_header.pay_period_ending = '"& Format(Parameters!PPE.Value, "yyyy-MM-dd") &"'" & vbCrLf & 
+"AND DBA.ro_curr_header.active = 'Y' AND DBA.ro_curr_header.live_or_costing = 'L' AND DBA.ro_shift_type.type  <> 'PC_BREAK'" & vbCrLf & 
+"AND EXISTS (SELECT * FROM DBA.re_master, DBA.sy_user_location, DBA.re_location WHERE DBA.re_master.location = DBA.sy_user_location.location AND DBA.re_master.location = DBA.re_location.code AND DBA.re_location.active='Y' " & vbCrLf & 
+"AND (UPPER(DBA.sy_user_location.user_id ) = UPPER(TRIM(RIGHT('" & Parameters!UserID.Value & "', LENGTH('" & Parameters!UserID.Value & "') - 10)))) AND module='RO' AND DBA.re_master.location = DBA.ro_curr_header.location)" & vbCrLf & 
+"" & vbCrLf & 
+"/* B. then identify all shifts in the rosters in that pay period involving those employee shift dates , even if you would not normally have access to those rosters. Where on any date employee has " & vbCrLf & 
+"broken shift spanning more than 12 hours. */" & vbCrLf & 
+"SELECT DBA.ro_curr_shift_line.employee_code, DBA.py_employee_master.surname, DBA.py_employee_master.christian_name_1, " & vbCrLf & 
+"DBA.py_employee_master.classification_code, DBA.ro_curr_shift_line.shift_date, " & vbCrLf & 
+"COUNT(DBA.ro_curr_shift_line.sequence_no) as numberOFShifts, MIN(DBA.ro_curr_shift_line.start_time) as stTime, MAX(DBA.ro_curr_shift_line.end_time) as endTime, " & vbCrLf & 
+"datediff(minute,stTime,endTime)/60.0 as timediff, COUNT(DISTINCT DBA.ro_curr_header.location) as [distinct_locations]" & vbCrLf & 
+"INTO #great_than_12hr_bs_shifts" & vbCrLf & 
+"FROM DBA.ro_curr_header" & vbCrLf & 
+"INNER JOIN DBA.ro_curr_shift_line ON DBA.ro_curr_header.roster_no = DBA.ro_curr_shift_line.roster_no" & vbCrLf & 
+"INNER JOIN DBA.ro_shift_type ON DBA.ro_shift_type.type = DBA.ro_curr_shift_line.shift_type" & vbCrLf & 
+"INNER JOIN DBA.py_employee_master ON DBA.py_employee_master.employee_code = DBA.ro_curr_shift_line.employee_code" & vbCrLf & 
+"WHERE DBA.ro_curr_header.pay_period_ending = '"& Format(Parameters!PPE.Value, "yyyy-MM-dd") &"'" & vbCrLf & 
+"AND DBA.ro_curr_header.active = 'Y' AND DBA.py_employee_master.employee_code NOT IN (99999,99998) AND DBA.ro_curr_header.live_or_costing = 'L' AND DBA.ro_shift_type.type <> 'PC_BREAK'" & vbCrLf & 
+"AND EXISTS (SELECT * FROM #employee_shift_dates WHERE #employee_shift_dates.employee_code = DBA.ro_curr_shift_line.employee_code AND #employee_shift_dates.shift_date = DBA.ro_curr_shift_line.shift_date)" & vbCrLf & 
+"GROUP BY DBA.ro_curr_shift_line.employee_code, DBA.py_employee_master.surname, DBA.py_employee_master.christian_name_1, " & vbCrLf & 
+"DBA.py_employee_master.classification_code, DBA.ro_curr_shift_line.shift_date" & vbCrLf & 
+"HAVING COUNT(DBA.ro_curr_shift_line.sequence_no) > 1 AND timediff > 12.0" & vbCrLf & 
+"ORDER BY DBA.ro_curr_shift_line.employee_code" & vbCrLf & 
+"" & vbCrLf & 
+"" & vbCrLf & 
+"" & vbCrLf & 
+"/* C. INNER JOIN B. back onto the shifts in the rosters to which you have access. Where the sum of hours in B. exceeds the sum of hours in you rosters alone, flag that some of the hours" & vbCrLf & 
+"come from other rosters */" & vbCrLf & 
+"" & vbCrLf & 
+"SELECT #employee_shift_dates.py_location ,#employee_shift_dates.employee_code, #employee_shift_dates.classification_code ,#employee_shift_dates.surname," & vbCrLf & 
+" #employee_shift_dates.christian_name_1, #employee_shift_dates.roster_no, #employee_shift_dates.shift_date, " & vbCrLf & 
+"#employee_shift_dates.shift_type, #employee_shift_dates.start_time," & vbCrLf & 
+"#employee_shift_dates.end_time, #employee_shift_dates.ro_location," & vbCrLf & 
+"#great_than_12hr_bs_shifts.numberOfShifts, #great_than_12hr_bs_shifts.stTime as [Earliest Start Time]," & vbCrLf & 
+" #great_than_12hr_bs_shifts.endTime as [Latest End Time], #great_than_12hr_bs_shifts.timediff as span, #great_than_12hr_bs_shifts.[distinct_locations]" & vbCrLf & 
+"FROM #employee_shift_dates INNER JOIN #great_than_12hr_bs_shifts ON #employee_shift_dates.employee_code =  #great_than_12hr_bs_shifts.employee_code" & vbCrLf & 
+"AND #employee_shift_dates.shift_date =  #great_than_12hr_bs_shifts.shift_date"
