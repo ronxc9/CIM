@@ -8,7 +8,7 @@
 "INNER JOIN DBA.ro_shift_type ON DBA.ro_shift_type.type = DBA.ro_curr_shift_line.shift_type" & vbCrLf & 
 "INNER JOIN DBA.py_employee_master ON DBA.py_employee_master.employee_code = DBA.ro_curr_shift_line.employee_code" & vbCrLf & 
 "WHERE DBA.ro_curr_header.pay_period_ending = '"& Format(Parameters!PPE.Value, "yyyy-MM-dd") &"'" & vbCrLf & 
-"AND DBA.ro_curr_header.active = 'Y' AND DBA.ro_curr_header.live_or_costing = 'L' AND DBA.ro_shift_type.type  <> 'PC_BREAK'" & vbCrLf & 
+"AND DBA.ro_curr_header.live_or_costing = 'L' AND DBA.ro_shift_type.type  <> 'PC_BREAK'" & vbCrLf & 
 "AND EXISTS (SELECT * FROM DBA.re_master, DBA.sy_user_location, DBA.re_location WHERE DBA.re_master.location = DBA.sy_user_location.location AND DBA.re_master.location = DBA.re_location.code AND DBA.re_location.active='Y' " & vbCrLf & 
 "AND (UPPER(DBA.sy_user_location.user_id ) = UPPER(TRIM(RIGHT('" & Parameters!UserID.Value & "', LENGTH('" & Parameters!UserID.Value & "') - 10)))) AND module='RO' AND DBA.re_master.location = DBA.ro_curr_header.location)" & vbCrLf & 
 "" & vbCrLf & 
@@ -24,7 +24,7 @@
 "INNER JOIN DBA.ro_shift_type ON DBA.ro_shift_type.type = DBA.ro_curr_shift_line.shift_type" & vbCrLf & 
 "INNER JOIN DBA.py_employee_master ON DBA.py_employee_master.employee_code = DBA.ro_curr_shift_line.employee_code" & vbCrLf & 
 "WHERE DBA.ro_curr_header.pay_period_ending = '"& Format(Parameters!PPE.Value, "yyyy-MM-dd") &"'" & vbCrLf & 
-"AND DBA.ro_curr_header.active = 'Y' AND DBA.py_employee_master.employee_code NOT IN (99999,99998) AND DBA.ro_curr_header.live_or_costing = 'L' AND DBA.ro_shift_type.type <> 'PC_BREAK'" & vbCrLf & 
+"AND  DBA.py_employee_master.employee_code NOT IN (99999,99998) AND DBA.ro_curr_header.live_or_costing = 'L' AND DBA.ro_shift_type.type NOT IN ('PC_BREAK','RN_BREAK', 'DOM_BREAK','EN_BREAK')" & vbCrLf & 
 "AND EXISTS (SELECT * FROM #employee_shift_dates WHERE #employee_shift_dates.employee_code = DBA.ro_curr_shift_line.employee_code AND #employee_shift_dates.shift_date = DBA.ro_curr_shift_line.shift_date)" & vbCrLf & 
 "GROUP BY DBA.ro_curr_shift_line.employee_code, DBA.py_employee_master.surname, DBA.py_employee_master.christian_name_1, " & vbCrLf & 
 "DBA.py_employee_master.classification_code, DBA.ro_curr_shift_line.shift_date" & vbCrLf & 

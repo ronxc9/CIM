@@ -1,0 +1,120 @@
+/*HOS/HOSTEL*/
+--CREATE TABLE
+CREATE TABLE tables_with_costcenters_filtered (table_name char(50), column_name char (50), count int)
+
+DROP TABLE  tables_with_costcenters
+DROP TABLE tables_with_costcenters_filtered
+
+SELECT * FROM tables_with_costcenters_filtered
+DELETE FROM tables_with_costcenters_filtered
+
+DELETE FROM tables_with_costcenters
+
+/*GET TABLES WITH SPECIFIED table names and columns*/
+SELECT  identity(10) AS rownum, cname, tname
+INTO tables_with_costcenters
+FROM sys.syscolumns
+WHERE cname LIKE '%costcenter%' OR cname LIKE '%costcentre%' OR (cname LIKE '%cc%' AND cname NOT LIKE '%account%' AND cname NOT LIKE '%access%' AND cname NOT LIKE '%hacc%' AND cname NOT LIKE '%success%' AND cname NOT LIKE '%accom%' AND cname NOT LIKE '%accru%' AND cname NOT LIKE '%accep%' AND cname NOT LIKE '%occu%' AND cname NOT LIKE '%accum%' AND cname NOT LIKE '%acc%')
+
+SELECT *
+FROM
+tables_with_costcenters
+
+DECLARE @i int, @col varchar(100), @tab varchar(100), @Sql varchar(10000), @x int
+SELECT @i=1
+/*get count of SELECT * FROM tables_with_costcenters*/
+WHILE (@i<=272)
+BEGIN
+SELECT @col=cname, @tab=tname FROM tables_with_costcenters
+WHERE rownum=@i
+SELECT @Sql = 'INSERT INTO tables_with_costcenters_filtered (table_name, column_name,  count) select ''' + @tab + ''' , ''' + @col + ''' , COUNT(' + @col + ') AS num_rows from ' + @tab + ' where ' + @col + ' LIKE ''%HOS%'' OR ' + @col + ' LIKE ''%HOSTEL%'''
+SELECT @Sql /*View the code*/
+EXECUTE(@Sql)
+SELECT @i=@i+1
+END
+
+SELECT * FROM tables_with_costcenters_filtered 
+
+
+/*NH/Nursing Home*/
+
+
+DECLARE @i int, @col varchar(100), @tab varchar(100), @Sql varchar(10000), @x int
+SELECT @i=1
+/*get count of SELECT * FROM tables_with_costcenters*/
+WHILE (@i<=272)
+BEGIN
+SELECT @col=cname, @tab=tname FROM tables_with_costcenters
+WHERE rownum=@i
+SELECT @Sql = 'INSERT INTO tables_with_costcenters_filtered (table_name, column_name,  count) select ''' + @tab + ''' , ''' + @col + ''' , COUNT(' + @col + ') AS num_rows from ' + @tab + ' where ' + @col + ' LIKE ''%NH%'' OR ' + @col + ' LIKE ''%Nursing Home%'''
+SELECT @Sql /*View the code*/
+EXECUTE(@Sql)
+SELECT @i=@i+1
+END
+
+SELECT * FROM tables_with_costcenters_filtered 
+
+
+
+
+/*ILU*/
+
+
+DECLARE @i int, @col varchar(100), @tab varchar(100), @Sql varchar(10000), @x int
+SELECT @i=1
+/*get count of SELECT * FROM tables_with_costcenters*/
+WHILE (@i<=272)
+BEGIN
+SELECT @col=cname, @tab=tname FROM tables_with_costcenters
+WHERE rownum=@i
+SELECT @Sql = 'INSERT INTO tables_with_costcenters_filtered (table_name, column_name,  count) select ''' + @tab + ''' , ''' + @col + ''' , COUNT(' + @col + ') AS num_rows from ' + @tab + ' where ' + @col + ' LIKE ''%ILU%'' OR ' + @col + ' LIKE ''%Independent Living%'''
+SELECT @Sql /*View the code*/
+EXECUTE(@Sql)
+SELECT @i=@i+1
+END
+
+SELECT * FROM tables_with_costcenters_filtered 
+
+
+
+
+/*HIGH CARE/LOW CARE*/
+
+
+DECLARE @i int, @col varchar(100), @tab varchar(100), @Sql varchar(10000), @x int
+SELECT @i=1
+/*get count of SELECT * FROM tables_with_costcenters*/
+WHILE (@i<=272)
+BEGIN
+SELECT @col=cname, @tab=tname FROM tables_with_costcenters
+WHERE rownum=@i
+SELECT @Sql = 'INSERT INTO tables_with_costcenters_filtered (table_name, column_name,  count) select ''' + @tab + ''' , ''' + @col + ''' , COUNT(' + @col + ') AS num_rows from ' + @tab + ' where ' + @col + ' LIKE ''%high care%'' OR ' + @col + ' LIKE ''%low care%'' OR ' + @col + ' LIKE ''%HC%'' OR ' + @col + ' LIKE ''%LC%'''
+SELECT @Sql /*View the code*/
+EXECUTE(@Sql)
+SELECT @i=@i+1
+END
+
+SELECT * FROM tables_with_costcenters_filtered 
+
+
+
+
+/* Test the output of the query script */
+DECLARE @i int, @col varchar(100), @tab varchar(100), @Sql varchar(10000), @x int
+SELECT @col=cname, @tab=tname FROM tables_with_costcenters
+SELECT @Sql = 'INSERT INTO tables_with_costcenters_filtered (table_name, column_name,  count) select ''' + @tab + ''' , ''' + @col + ''' , COUNT(' + @col + ') AS num_rows from ' + @tab + ' where ' + @col + ' LIKE ''%high%'' OR ' + @col + ' LIKE ''%low%'''
+SELECT @Sql 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
