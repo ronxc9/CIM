@@ -37,6 +37,7 @@ SELECT @i=@i+1
 END
 
 SELECT * FROM tables_with_costcenters_filtered 
+ORDER BY table_name, column_name
 
 
 /*NH/Nursing Home*/
@@ -56,6 +57,7 @@ SELECT @i=@i+1
 END
 
 SELECT * FROM tables_with_costcenters_filtered 
+ORDER BY table_name, column_name
 
 
 
@@ -77,6 +79,7 @@ SELECT @i=@i+1
 END
 
 SELECT * FROM tables_with_costcenters_filtered 
+ORDER BY table_name, column_name
 
 
 
@@ -98,6 +101,7 @@ SELECT @i=@i+1
 END
 
 SELECT * FROM tables_with_costcenters_filtered 
+ORDER BY table_name, column_name
 
 
 
@@ -124,6 +128,8 @@ SELECT @i=@i+1
 END
 
 SELECT * FROM tables_with_costcenters_filtered 
+ORDER BY table_name, column_name
+
 
 
 
@@ -136,4 +142,59 @@ SELECT @Sql
 
 
 
+/*PER*/
 
+DECLARE @i int, @col varchar(100), @tab varchar(100), @Sql varchar(10000), @x int
+SELECT @i=1
+/*get count of SELECT * FROM tables_with_costcenters*/
+WHILE (@i<=272)
+BEGIN
+SELECT @col=cname, @tab=tname FROM tables_with_costcenters
+WHERE rownum=@i
+SELECT @Sql = 'INSERT INTO tables_with_costcenters_filtered (table_name, column_name,  count) select ''' + @tab + ''' , ''' + @col + ''' , COUNT(' + @col + ') AS num_rows from ' + @tab + ' where ' + @col + ' LIKE ''%PER%'''
+SELECT @Sql /*View the code*/
+EXECUTE(@Sql)
+SELECT @i=@i+1
+END
+
+SELECT * FROM tables_with_costcenters_filtered 
+ORDER BY table_name, column_name
+
+
+
+/*RL*/
+
+DECLARE @i int, @col varchar(100), @tab varchar(100), @Sql varchar(10000), @x int
+SELECT @i=1
+/*get count of SELECT * FROM tables_with_costcenters*/
+WHILE (@i<=272)
+BEGIN
+SELECT @col=cname, @tab=tname FROM tables_with_costcenters
+WHERE rownum=@i
+SELECT @Sql = 'INSERT INTO tables_with_costcenters_filtered (table_name, column_name,  count) select ''' + @tab + ''' , ''' + @col + ''' , COUNT(' + @col + ') AS num_rows from ' + @tab + ' where ' + @col + ' LIKE ''%RL%'''
+SELECT @Sql /*View the code*/
+EXECUTE(@Sql)
+SELECT @i=@i+1
+END
+
+SELECT * FROM tables_with_costcenters_filtered 
+ORDER BY table_name, column_name
+
+
+/*RES*/
+
+DECLARE @i int, @col varchar(100), @tab varchar(100), @Sql varchar(10000), @x int
+SELECT @i=1
+/*get count of SELECT * FROM tables_with_costcenters*/
+WHILE (@i<=272)
+BEGIN
+SELECT @col=cname, @tab=tname FROM tables_with_costcenters
+WHERE rownum=@i
+SELECT @Sql = 'INSERT INTO tables_with_costcenters_filtered (table_name, column_name,  count) select ''' + @tab + ''' , ''' + @col + ''' , COUNT(' + @col + ') AS num_rows from ' + @tab + ' where ' + @col + ' LIKE ''%RES%'''
+SELECT @Sql /*View the code*/
+EXECUTE(@Sql)
+SELECT @i=@i+1
+END
+
+SELECT * FROM tables_with_costcenters_filtered 
+ORDER BY table_name, column_name
